@@ -14,7 +14,7 @@ namespace Vibes
         public static implicit operator int(Vibe id) => id.hash;
         public static implicit operator string(Vibe id) => id.name;
 
-        public readonly bool Equals(Vibe other)
+        public bool Equals(Vibe other)
         {
             return hash == other.hash;
         }

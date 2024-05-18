@@ -20,36 +20,39 @@ namespace Vibes
 
         public void Set(Vibe vibe, float baseValue)
         {
-            if (stored.TryGetValue(vibe, out var data))
+            if (!TryNew(vibe, new Data(baseValue)))
             {
-                data.value = baseValue;
-                stored[vibe] = data;
+                Data existing_data = stored[vibe];
+                existing_data.value = baseValue;
+                stored[vibe] = existing_data;
             }
-            else
-                Set(vibe, baseValue, ScalingAlgorithms.Operation.linear, 1);
         }
 
         public void Set(Vibe vibe, float baseValue, ScalingAlgorithms.Operation operation, float scale)
         {
             Data data = new Data(baseValue, operation, scale);
-            if (!stored.TryAdd(vibe, data))
+            if (!TryNew(vibe, data))
                 stored[vibe] = data;
-            else
-                keys.Add(vibe);
         }
 
         public void Add(Vibe vibe, float valueIncrement)
         {
-            if (stored.TryGetValue(vibe, out var existing_data))
+            if (!TryNew(vibe, new Data(valueIncrement)))
             {
+                Data existing_data = stored[vibe];
                 existing_data.value += valueIncrement;
                 stored[vibe] = existing_data;
             }
-            else
-            {
-                stored.Add(vibe, new Data(valueIncrement));
-                keys.Add(vibe);
-            }
+        }
+
+        bool TryNew(Vibe vibe, Data data)
+        {
+            if (stored.ContainsKey(vibe))
+                return false;
+
+            stored.Add(vibe, data);
+            keys.Add(vibe);
+            return true;
         }
 
         public bool Remove(Vibe vibe)
@@ -91,7 +94,7 @@ namespace Vibes
             public float scale;
             public ScalingAlgorithms.Operation operation;
 
-            public readonly float GetValue(float stack) => ScalingAlgorithms.Perform(operation, stack, value, scale);
+            public float GetValue(float stack) => ScalingAlgorithms.Perform(operation, stack, value, scale);
         }
 
         public static class ScalingAlgorithms

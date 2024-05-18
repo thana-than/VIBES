@@ -18,10 +18,8 @@ namespace Vibes
             //* Since the stack value has not been provided as a parameter, we assume each provided table is 1 stack. 
             foreach (var table in tables)
             {
-                if (!tableData.TryAdd(table, 1))
+                if (!TryNew(table, 1))
                     tableData[table]++;
-                else
-                    tableKeys.Add(table);
             }
         }
 
@@ -42,12 +40,10 @@ namespace Vibes
             int len = tableStacks.Length;
             for (int i = 0; i < len; i++)
             {
-                var key = tableStacks[i].Key;
-                float stacks = tableStacks[i].Value;
-                if (!tableData.TryAdd(key, stacks))
-                    tableData[key] += stacks;
-                else
-                    tableKeys.Add(key);
+                var table = tableStacks[i].Key;
+                float stack = tableStacks[i].Value;
+                if (!TryNew(table, stack))
+                    tableData[table] += stack;
             }
 
             //*Validate to ensure there are no invalid tables after the stacks have been summed
@@ -62,10 +58,18 @@ namespace Vibes
                 return;
             }
 
-            if (!tableData.TryAdd(table, stack))
+            if (!TryNew(table, stack))
                 tableData[table] = stack;
-            else
-                tableKeys.Add(table);
+        }
+
+        bool TryNew(IVibeTable table, float stack)
+        {
+            if (tableData.ContainsKey(table))
+                return false;
+
+            tableData.Add(table, stack);
+            tableKeys.Add(table);
+            return true;
         }
 
         public void Add(IVibeTable table, float stack = 1)

@@ -5,6 +5,8 @@ VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Vibes", "Vibes\Vibes.csproj", "{A16C326B-64AA-467B-812F-36FA7BCADBEE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Vibes.Tests", "Vibes.Tests\Vibes.Tests.csproj", "{5F9015D8-8026-462F-946F-F824735A0D92}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,5 +20,9 @@ Global
 		{A16C326B-64AA-467B-812F-36FA7BCADBEE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A16C326B-64AA-467B-812F-36FA7BCADBEE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A16C326B-64AA-467B-812F-36FA7BCADBEE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5F9015D8-8026-462F-946F-F824735A0D92}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5F9015D8-8026-462F-946F-F824735A0D92}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5F9015D8-8026-462F-946F-F824735A0D92}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5F9015D8-8026-462F-946F-F824735A0D92}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
