@@ -13,10 +13,9 @@ namespace Vibes
 
         public VibeTable(params KeyValuePair<Vibe, float>[] vibes)
         {
-            foreach (var kvp in vibes)
-            {
-                Add(kvp.Key, kvp.Value);
-            }
+            int len = vibes.Length;
+            for (int i = 0; i < len; i++)
+                Add(vibes[i].Key, vibes[i].Value);
         }
 
         public void Set(Vibe vibe, float baseValue)
@@ -92,7 +91,6 @@ namespace Vibes
             public float scale;
             public ScalingAlgorithms.Operation operation;
 
-            //TODO zero safety check??
             public readonly float GetValue(float stack) => ScalingAlgorithms.Perform(operation, stack, value, scale);
         }
 
