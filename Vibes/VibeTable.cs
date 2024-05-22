@@ -67,7 +67,7 @@ namespace Vibes.Core
 
         bool TryNew(IVibeKey vibe, Data data)
         {
-            if (stored.ContainsKey(vibe))
+            if (ContainsKey(vibe))
                 return false;
 
             stored.Add(vibe, data);
@@ -75,7 +75,12 @@ namespace Vibes.Core
             return true;
         }
 
-        public bool Remove(VibeKey vibe)
+        public bool ContainsKey(IVibeKey vibe)
+        {
+            return stored.ContainsKey(vibe);
+        }
+
+        public bool Remove(IVibeKey vibe)
         {
             if (stored.Remove(vibe))
             {
