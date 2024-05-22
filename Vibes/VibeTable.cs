@@ -11,7 +11,15 @@ namespace Vibes
         readonly List<Vibe> keys = new List<Vibe>();
         public ReadOnlyCollection<Vibe> StoredKeys => keys.AsReadOnly();
 
+        public VibeTable() { }
         public VibeTable(params KeyValuePair<Vibe, float>[] vibes)
+        {
+            int len = vibes.Length;
+            for (int i = 0; i < len; i++)
+                Add(vibes[i].Key, vibes[i].Value);
+        }
+
+        public VibeTable(params KeyValuePair<string, float>[] vibes)
         {
             int len = vibes.Length;
             for (int i = 0; i < len; i++)
@@ -30,6 +38,7 @@ namespace Vibes
                 stored[vibe] = existing_data;
             }
         }
+        public void Set(string vibe, float baseValue) => Set(new Vibe(vibe), baseValue);
 
         public void Set(Vibe vibe, float baseValue, ScalingAlgorithms.Operation operation, float scale)
         {
@@ -40,6 +49,7 @@ namespace Vibes
             if (!TryNew(vibe, data))
                 stored[vibe] = data;
         }
+        public void Set(string vibe, float baseValue, ScalingAlgorithms.Operation operation, float scale) => Set(new Vibe(vibe), baseValue, operation, scale);
 
         public void Add(Vibe vibe, float valueIncrement)
         {
@@ -53,6 +63,7 @@ namespace Vibes
                 stored[vibe] = existing_data;
             }
         }
+        public void Add(string vibe, float valueIncrement) => Add(new Vibe(vibe), valueIncrement);
 
         bool TryNew(Vibe vibe, Data data)
         {
@@ -76,6 +87,7 @@ namespace Vibes
         }
 
         public float Get(Vibe vibe) => Get(vibe, 1);
+        public float Get(string vibe) => Get(vibe, 1);
         public float Get(Vibe vibe, float stack)
         {
             if (stored.TryGetValue(vibe, out var data))
@@ -83,6 +95,7 @@ namespace Vibes
 
             return 0;
         }
+        public float Get(string vibe, float stack) => Get(new Vibe(vibe), stack);
 
         public void Clear()
         {
