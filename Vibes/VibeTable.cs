@@ -20,6 +20,9 @@ namespace Vibes
 
         public void Set(Vibe vibe, float baseValue)
         {
+            if (!vibe.isValid)
+                return;
+
             if (!TryNew(vibe, new Data(baseValue)))
             {
                 Data existing_data = stored[vibe];
@@ -30,6 +33,9 @@ namespace Vibes
 
         public void Set(Vibe vibe, float baseValue, ScalingAlgorithms.Operation operation, float scale)
         {
+            if (!vibe.isValid)
+                return;
+
             Data data = new Data(baseValue, operation, scale);
             if (!TryNew(vibe, data))
                 stored[vibe] = data;
@@ -37,6 +43,9 @@ namespace Vibes
 
         public void Add(Vibe vibe, float valueIncrement)
         {
+            if (!vibe.isValid)
+                return;
+
             if (!TryNew(vibe, new Data(valueIncrement)))
             {
                 Data existing_data = stored[vibe];
