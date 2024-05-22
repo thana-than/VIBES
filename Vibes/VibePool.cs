@@ -12,6 +12,7 @@ namespace Vibes
         public ReadOnlyCollection<IVibeTable> StoredKeys => tableKeys.AsReadOnly();
         bool StacksValid(float stacks) => stacks > 0;
 
+        public VibePool() { }
         public VibePool(params IVibeTable[] tables)
         {
             //*Sum all the stacks provided, since duplicate tables may be provided
@@ -20,17 +21,6 @@ namespace Vibes
             {
                 if (!TryNew(table, 1))
                     tableData[table]++;
-            }
-        }
-
-        void ValidateTables()
-        {
-            //*Ensure all our table stacks are a valid number (> 0), if they aren't remove!!!
-            for (int i = tableKeys.Count - 1; i >= 0; i--)
-            {
-                var key = tableKeys[i];
-                if (!StacksValid(tableData[key]))
-                    Remove(key);
             }
         }
 
@@ -50,6 +40,17 @@ namespace Vibes
             ValidateTables();
         }
 
+        void ValidateTables()
+        {
+            //*Ensure all our table stacks are a valid number (> 0), if they aren't remove!!!
+            for (int i = tableKeys.Count - 1; i >= 0; i--)
+            {
+                var key = tableKeys[i];
+                if (!StacksValid(tableData[key]))
+                    Remove(key);
+            }
+        }
+
         public void Set(IVibeTable table, float stack = 1)
         {
             if (!StacksValid(stack))
@@ -60,16 +61,6 @@ namespace Vibes
 
             if (!TryNew(table, stack))
                 tableData[table] = stack;
-        }
-
-        bool TryNew(IVibeTable table, float stack)
-        {
-            if (tableData.ContainsKey(table))
-                return false;
-
-            tableData.Add(table, stack);
-            tableKeys.Add(table);
-            return true;
         }
 
         public void Add(IVibeTable table, float stack = 1)
@@ -87,6 +78,16 @@ namespace Vibes
                 tableData.Add(table, stack);
                 tableKeys.Add(table);
             }
+        }
+
+        bool TryNew(IVibeTable table, float stack)
+        {
+            if (tableData.ContainsKey(table))
+                return false;
+
+            tableData.Add(table, stack);
+            tableKeys.Add(table);
+            return true;
         }
 
         public bool Remove(IVibeTable table)
@@ -115,6 +116,14 @@ namespace Vibes
                 sum += tableKeys[i].Get(vibe, tableData[tableKeys[i]]);
             }
             return sum;
+        }
+
+        public float GetStacks(IVibeTable tableKey)
+        {
+            if (tableData.TryGetValue(tableKey, out float stacks))
+                return stacks;
+
+            return 0;
         }
     }
 }
