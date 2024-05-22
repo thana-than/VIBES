@@ -1,6 +1,9 @@
+using System;
+
 namespace Vibes
 {
-    public readonly struct Vibe : System.IEquatable<Vibe>
+    [Serializable]
+    public readonly struct Vibe : IEquatable<Vibe>
     {
         public Vibe(string name)
         {
