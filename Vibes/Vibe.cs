@@ -6,10 +6,12 @@ namespace Vibes
         {
             this.name = name;
             hash = name.GetHashCode();
+            isValid = true;
         }
 
         public readonly string name;
         public readonly int hash;
+        public readonly bool isValid;
 
         public static implicit operator int(Vibe id) => id.hash;
         public static implicit operator string(Vibe id) => id.name;
