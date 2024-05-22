@@ -87,6 +87,7 @@ namespace Vibes
         public void Clear()
         {
             stored.Clear();
+            keys.Clear();
         }
 
         struct Data
