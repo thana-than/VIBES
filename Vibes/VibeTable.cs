@@ -5,14 +5,14 @@ using System.Collections.ObjectModel;
 namespace Vibes.Core
 {
     [Serializable]
-    public class VibeTable : IVibeTable, IGetVibes, ISetVibes, IStoreReadonlyKeys<Vibe>
+    public class VibeTable : IVibeTable, IGetVibes, ISetVibes, IStoreReadonlyKeys<IVibeKey>
     {
-        readonly Dictionary<Vibe, Data> stored = new Dictionary<Vibe, Data>();
-        readonly List<Vibe> keys = new List<Vibe>();
-        public ReadOnlyCollection<Vibe> StoredKeys => keys.AsReadOnly();
+        readonly Dictionary<IVibeKey, Data> stored = new Dictionary<IVibeKey, Data>();
+        readonly List<IVibeKey> keys = new List<IVibeKey>();
+        public ReadOnlyCollection<IVibeKey> StoredKeys => keys.AsReadOnly();
 
         public VibeTable() { }
-        public VibeTable(params KeyValuePair<Vibe, float>[] vibes)
+        public VibeTable(params KeyValuePair<IVibeKey, float>[] vibes)
         {
             int len = vibes.Length;
             for (int i = 0; i < len; i++)
@@ -26,9 +26,9 @@ namespace Vibes.Core
                 Add(vibes[i].Key, vibes[i].Value);
         }
 
-        public void Set(Vibe vibe, float baseValue)
+        public void Set(IVibeKey vibe, float baseValue)
         {
-            if (!vibe.isValid)
+            if (!vibe.IsValid())
                 return;
 
             if (!TryNew(vibe, new Data(baseValue)))
@@ -38,22 +38,22 @@ namespace Vibes.Core
                 stored[vibe] = existing_data;
             }
         }
-        public void Set(string vibe, float baseValue) => Set(new Vibe(vibe), baseValue);
+        public void Set(string vibe, float baseValue) => Set(new VibeKey(vibe), baseValue);
 
-        public void Set(Vibe vibe, float baseValue, ScalingAlgorithms.Operation operation, float scale)
+        public void Set(IVibeKey vibe, float baseValue, ScalingAlgorithms.Operation operation, float scale)
         {
-            if (!vibe.isValid)
+            if (!vibe.IsValid())
                 return;
 
             Data data = new Data(baseValue, operation, scale);
             if (!TryNew(vibe, data))
                 stored[vibe] = data;
         }
-        public void Set(string vibe, float baseValue, ScalingAlgorithms.Operation operation, float scale) => Set(new Vibe(vibe), baseValue, operation, scale);
+        public void Set(string vibe, float baseValue, ScalingAlgorithms.Operation operation, float scale) => Set(new VibeKey(vibe), baseValue, operation, scale);
 
-        public void Add(Vibe vibe, float valueIncrement)
+        public void Add(IVibeKey vibe, float valueIncrement)
         {
-            if (!vibe.isValid)
+            if (!vibe.IsValid())
                 return;
 
             if (!TryNew(vibe, new Data(valueIncrement)))
@@ -63,9 +63,9 @@ namespace Vibes.Core
                 stored[vibe] = existing_data;
             }
         }
-        public void Add(string vibe, float valueIncrement) => Add(new Vibe(vibe), valueIncrement);
+        public void Add(string vibe, float valueIncrement) => Add(new VibeKey(vibe), valueIncrement);
 
-        bool TryNew(Vibe vibe, Data data)
+        bool TryNew(IVibeKey vibe, Data data)
         {
             if (stored.ContainsKey(vibe))
                 return false;
@@ -75,7 +75,7 @@ namespace Vibes.Core
             return true;
         }
 
-        public bool Remove(Vibe vibe)
+        public bool Remove(VibeKey vibe)
         {
             if (stored.Remove(vibe))
             {
@@ -86,16 +86,16 @@ namespace Vibes.Core
             return false;
         }
 
-        public float Get(Vibe vibe) => Get(vibe, 1);
-        public float Get(string vibe) => Get(vibe, 1);
-        public float Get(Vibe vibe, float stack)
+        public float Get(IVibeKey vibe) => Get(vibe, 1);
+        public float Get(string vibe) => Get(new VibeKey(vibe), 1);
+        public float Get(IVibeKey vibe, float stack)
         {
             if (stored.TryGetValue(vibe, out var data))
                 return data.GetValue(stack);
 
             return 0;
         }
-        public float Get(string vibe, float stack) => Get(new Vibe(vibe), stack);
+        public float Get(string vibe, float stack) => Get(new VibeKey(vibe), stack);
 
         public void Clear()
         {

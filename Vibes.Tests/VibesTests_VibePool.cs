@@ -14,7 +14,7 @@ namespace Vibes.Core.Tests
         [InlineData("minValue", float.MinValue)]
         public void Test_PoolConstruction_ReturnsGivenValue(string key, float value)
         {
-            Vibe vibeKey = new Vibe(key);
+            VibeKey vibeKey = new VibeKey(key);
 
             VibeTable table = new VibeTable();
             table.Add(vibeKey, value);
@@ -32,7 +32,7 @@ namespace Vibes.Core.Tests
         [InlineData("minValue", float.MinValue)]
         public void Test_PoolAddition_ReturnsGivenValue(string key, float value)
         {
-            Vibe vibeKey = new Vibe(key);
+            VibeKey vibeKey = new VibeKey(key);
             VibeTable table = new VibeTable();
             VibePool pool = new VibePool();
 
@@ -51,7 +51,7 @@ namespace Vibes.Core.Tests
         [InlineData("minValue", float.MinValue)]
         public void Test_PoolSet_ReturnsGivenValue(string key, float value)
         {
-            Vibe vibeKey = new Vibe(key);
+            VibeKey vibeKey = new VibeKey(key);
             VibeTable table = new VibeTable();
             VibePool pool = new VibePool();
 
@@ -70,7 +70,7 @@ namespace Vibes.Core.Tests
         [InlineData("minValue", float.MinValue)]
         public void Test_PoolAdditionAfterTableChange_ReturnsGivenValue(string key, float value)
         {
-            Vibe vibeKey = new Vibe(key);
+            VibeKey vibeKey = new VibeKey(key);
             VibeTable table = new VibeTable();
             VibePool pool = new VibePool();
 
@@ -94,7 +94,7 @@ namespace Vibes.Core.Tests
             if (stackLessThanZero > 0) return;
 
             const int NON_ZERO_VALUE = 10;
-            Vibe key = new Vibe("key");
+            VibeKey key = new VibeKey("key");
             VibeTable table = new VibeTable();
             table.Add(key, NON_ZERO_VALUE);
 
@@ -113,7 +113,7 @@ namespace Vibes.Core.Tests
         {
             if (stackLessThanZero > 0) return;
 
-            Vibe key = new Vibe("key");
+            VibeKey key = new VibeKey("key");
             const int NON_ZERO_VALUE = 10;
             VibeTable table = new VibeTable();
             table.Add(key, NON_ZERO_VALUE);
@@ -134,7 +134,7 @@ namespace Vibes.Core.Tests
         {
             if (stackLessThanZero > 0) return;
 
-            Vibe key = new Vibe("key");
+            VibeKey key = new VibeKey("key");
             const int NON_ZERO_VALUE = 10;
             VibeTable table = new VibeTable();
             table.Add(key, NON_ZERO_VALUE);
@@ -152,7 +152,7 @@ namespace Vibes.Core.Tests
         [Fact]
         public void Test_PoolAddThenRemove_ReturnsZero()
         {
-            Vibe key = new Vibe("key");
+            VibeKey key = new VibeKey("key");
             const int NON_ZERO_VALUE = 10;
             VibeTable table = new VibeTable();
             table.Add(key, NON_ZERO_VALUE);
@@ -170,7 +170,7 @@ namespace Vibes.Core.Tests
         [Fact]
         public void Test_PoolAddThenClear_ReturnsZero()
         {
-            Vibe key = new Vibe("key");
+            VibeKey key = new VibeKey("key");
             const int NON_ZERO_VALUE = 10;
             VibeTable table = new VibeTable();
             table.Add(key, NON_ZERO_VALUE);
@@ -196,7 +196,7 @@ namespace Vibes.Core.Tests
         [InlineData(float.MinValue, float.MaxValue)]
         public void Test_PoolAddThenSetSameTableAndKey_ReturnSetValue(float startAddValue, float setValue)
         {
-            Vibe key = new Vibe("key");
+            VibeKey key = new VibeKey("key");
             VibeTable table = new VibeTable();
             VibePool pool = new VibePool(table);
 
@@ -216,7 +216,7 @@ namespace Vibes.Core.Tests
         public void Test_PoolAddTwice_ReturnStacksEquallingSum(float value1, float value2)
         {
             float expected_sum = Math.Max(0, value1) + Math.Max(0, value2); //* Stacks reduced below zero will be removed from the pool, so each value should recognize less than zero as simply zero
-            Vibe key = new Vibe("key");
+            VibeKey key = new VibeKey("key");
             VibeTable table = new VibeTable();
             table.Add(key, 1); //* Add a whatever key with whatever value
 
@@ -272,7 +272,7 @@ namespace Vibes.Core.Tests
             VibePool pool = new VibePool();
 
             //*Populate tables arrays
-            var GENERIC_VIBE_FLOAT_PAIR = new KeyValuePair<Vibe, float>(new Vibe("key"), 1);
+            var GENERIC_VIBE_FLOAT_PAIR = new KeyValuePair<IVibeKey, float>(new VibeKey("key"), 1);
             VibeTable[] tables = new VibeTable[tableLen];
             for (int i = 0; i < tableLen; i++) tables[i] = new VibeTable(GENERIC_VIBE_FLOAT_PAIR);
 
@@ -303,7 +303,7 @@ namespace Vibes.Core.Tests
         public void Test_PoolAddTwoTablesSameKey_ReturnSumValue(float value1, float value2)
         {
             float expected_sum = value1 + value2;
-            Vibe key = new Vibe("key");
+            VibeKey key = new VibeKey("key");
             VibeTable tableA = new VibeTable();
             VibeTable tableB = new VibeTable();
 
@@ -325,7 +325,7 @@ namespace Vibes.Core.Tests
         public void Test_PoolAddTable_ReturnsLinearCalculationOfValueAndStack(float value, float stack, float scale)
         {
             float expected_value = VibeTable.ScalingAlgorithms.Linear(stack, value, scale); //*Value that will be calculated from table data
-            Vibe key = new Vibe("key");
+            VibeKey key = new VibeKey("key");
             VibeTable table = new VibeTable();
             VibePool pool = new VibePool();
 

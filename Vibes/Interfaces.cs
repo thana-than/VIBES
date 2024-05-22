@@ -1,11 +1,17 @@
+using System;
 using System.Collections.ObjectModel;
 using Vibes.Core;
 
 namespace Vibes
 {
+    public interface IVibeKey : IEquatable<IVibeKey>
+    {
+        int GetHashCode();
+        bool IsValid();
+    }
     public interface IGetVibes
     {
-        float Get(Vibe vibe);
+        float Get(IVibeKey vibe);
     }
     public interface IStoreReadonlyKeys<T>
     {
@@ -13,10 +19,10 @@ namespace Vibes
     }
     public interface ISetVibes
     {
-        void Set(Vibe vibe, float baseValue);
+        void Set(IVibeKey vibe, float baseValue);
     }
     public interface IVibeTable
     {
-        float Get(Vibe vibe, float stacks);
+        float Get(IVibeKey vibe, float stacks);
     }
 }

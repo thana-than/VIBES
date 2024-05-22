@@ -107,7 +107,7 @@ namespace Vibes.Core
             tableKeys.Clear();
         }
 
-        public float Get(Vibe vibe)
+        public float Get(IVibeKey vibe)
         {
             float sum = 0;
             int count = tableKeys.Count;

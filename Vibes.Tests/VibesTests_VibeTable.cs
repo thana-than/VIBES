@@ -14,8 +14,8 @@ namespace Vibes.Core.Tests
         [InlineData("minValue", float.MinValue)]
         public void Test_TableConstruction_ReturnsGivenValue(string key, float value)
         {
-            Vibe vibeKey = new Vibe(key);
-            var vibeFloatPair = new KeyValuePair<Vibe, float>(vibeKey, value);
+            VibeKey vibeKey = new VibeKey(key);
+            var vibeFloatPair = new KeyValuePair<IVibeKey, float>(vibeKey, value);
 
             VibeTable table = new VibeTable(vibeFloatPair);
 
@@ -32,7 +32,7 @@ namespace Vibes.Core.Tests
         public void Test_TableAdd_ReturnsGivenValue(string key, float value)
         {
             VibeTable table = new VibeTable();
-            Vibe set_key = new Vibe(key);
+            VibeKey set_key = new VibeKey(key);
 
             table.Add(set_key, value);
 
@@ -49,7 +49,7 @@ namespace Vibes.Core.Tests
         public void Test_TableSet_ReturnsGivenValue(string key, float value)
         {
             VibeTable table = new VibeTable();
-            Vibe set_key = new Vibe(key);
+            VibeKey set_key = new VibeKey(key);
 
             table.Set(set_key, value);
 
@@ -110,9 +110,9 @@ namespace Vibes.Core.Tests
         [Fact]
         public void Test_TableConstruction_InvalidVibe_NonZeroValue_ReturnZero()
         {
-            Vibe invalidVibe = new Vibe();
+            VibeKey invalidVibe = new VibeKey();
             const int NON_ZERO_VALUE = 10;
-            var vibeFloatPair = new KeyValuePair<Vibe, float>(invalidVibe, NON_ZERO_VALUE);
+            var vibeFloatPair = new KeyValuePair<IVibeKey, float>(invalidVibe, NON_ZERO_VALUE);
 
             VibeTable table = new VibeTable(vibeFloatPair);
             float v = table.Get(invalidVibe);
@@ -123,7 +123,7 @@ namespace Vibes.Core.Tests
         [Fact]
         public void Test_TableSet_InvalidVibe_NonZeroValue_ReturnZero()
         {
-            Vibe invalidVibe = new Vibe();
+            VibeKey invalidVibe = new VibeKey();
             const int NON_ZERO_VALUE = 10;
             VibeTable table = new VibeTable();
 
@@ -136,7 +136,7 @@ namespace Vibes.Core.Tests
         [Fact]
         public void Test_TableEmpty_GetVibe_ReturnZero()
         {
-            Vibe vibe = new Vibe("key");
+            VibeKey vibe = new VibeKey("key");
             VibeTable table = new VibeTable();
 
             float v = table.Get(vibe);
@@ -147,8 +147,8 @@ namespace Vibes.Core.Tests
         public void Test_TableConstructThenRemove_ReturnsZero()
         {
             const int NON_ZERO_VALUE = 10;
-            Vibe key = new Vibe("key");
-            var vibeFloatPair = new KeyValuePair<Vibe, float>(key, NON_ZERO_VALUE);
+            VibeKey key = new VibeKey("key");
+            var vibeFloatPair = new KeyValuePair<IVibeKey, float>(key, NON_ZERO_VALUE);
 
             VibeTable table = new VibeTable(vibeFloatPair);
 
@@ -162,8 +162,8 @@ namespace Vibes.Core.Tests
         public void Test_TableConstructThenClear_ReturnsZero()
         {
             const int NON_ZERO_VALUE = 10;
-            Vibe key = new Vibe("key");
-            var vibeFloatPair = new KeyValuePair<Vibe, float>(key, NON_ZERO_VALUE);
+            VibeKey key = new VibeKey("key");
+            var vibeFloatPair = new KeyValuePair<IVibeKey, float>(key, NON_ZERO_VALUE);
 
             VibeTable table = new VibeTable(vibeFloatPair);
             table.Clear();
@@ -176,8 +176,8 @@ namespace Vibes.Core.Tests
         public void Test_TableConstructThenClear_CountRemainsZero()
         {
             const int NON_ZERO_VALUE = 10;
-            Vibe key = new Vibe("key");
-            var vibeFloatPair = new KeyValuePair<Vibe, float>(key, NON_ZERO_VALUE);
+            VibeKey key = new VibeKey("key");
+            var vibeFloatPair = new KeyValuePair<IVibeKey, float>(key, NON_ZERO_VALUE);
 
             VibeTable table = new VibeTable(vibeFloatPair);
             table.Clear();
@@ -198,7 +198,7 @@ namespace Vibes.Core.Tests
         [InlineData(float.MinValue, float.MaxValue)]
         public void Test_TableAddThenSet_ReturnSetValue(float startAddValue, float setValue)
         {
-            Vibe key = new Vibe("key");
+            VibeKey key = new VibeKey("key");
             VibeTable table = new VibeTable();
 
             table.Add(key, startAddValue);
@@ -217,7 +217,7 @@ namespace Vibes.Core.Tests
         [InlineData(float.MinValue, float.MaxValue)]
         public void Test_TableSetThenAdd_ReturnSumOfValues(float startSetValue, float addedValue)
         {
-            Vibe key = new Vibe("key");
+            VibeKey key = new VibeKey("key");
             VibeTable table = new VibeTable();
             float expected_sum = startSetValue + addedValue;
 
@@ -239,7 +239,7 @@ namespace Vibes.Core.Tests
             VibeTable table = new VibeTable();
 
             for (int i = 0; i < keyCount; i++)
-                table.Add(new Vibe(i.ToString()), 1); //*Unique keys are simply current index
+                table.Add(new VibeKey(i.ToString()), 1); //*Unique keys are simply current index
 
             Assert.True(table.StoredKeys.Count == keyCount, "StoredKeys should start with given count");
         }
@@ -251,7 +251,7 @@ namespace Vibes.Core.Tests
         public void Test_TableAdditions_DuplicateKey_ReturnSum(int keyCount)
         {
             if (keyCount <= 0) return;
-            Vibe key = new Vibe("key");
+            VibeKey key = new VibeKey("key");
             VibeTable table = new VibeTable();
 
             for (int i = 0; i < keyCount; i++)
@@ -274,10 +274,10 @@ namespace Vibes.Core.Tests
             VibeTable table = new VibeTable();
 
             for (int i = 0; i < additions; i++)
-                table.Add(new Vibe(i.ToString()), 1); //*Unique keys are simply current index
+                table.Add(new VibeKey(i.ToString()), 1); //*Unique keys are simply current index
 
             for (int i = 0; i < removals; i++)
-                table.Remove(new Vibe(i.ToString())); //*Remove keys starting from 0 towards removals int
+                table.Remove(new VibeKey(i.ToString())); //*Remove keys starting from 0 towards removals int
 
             Assert.True(table.StoredKeys.Count == difference, "StoredKeys.Count should be equal to the difference between the additions and removals to the table.");
         }
@@ -296,7 +296,7 @@ namespace Vibes.Core.Tests
             if (valueZeroOrLess > 0) return;
 
             VibeTable table = new VibeTable();
-            Vibe vibe = new Vibe("key");
+            VibeKey vibe = new VibeKey("key");
             const int NON_ZERO_VALUE = 10;
 
             table.Add(vibe, NON_ZERO_VALUE);
@@ -316,7 +316,7 @@ namespace Vibes.Core.Tests
             if (stack <= 0) return;
 
             VibeTable table = new VibeTable();
-            Vibe key = new Vibe("key");
+            VibeKey key = new VibeKey("key");
             float expected_value = VibeTable.ScalingAlgorithms.Linear(stack, value, 1);
 
             table.Set(key, value);
@@ -355,7 +355,7 @@ namespace Vibes.Core.Tests
             if (stack <= 0) return;
 
             VibeTable table = new VibeTable();
-            Vibe key = new Vibe("key");
+            VibeKey key = new VibeKey("key");
             float expected_value = VibeTable.ScalingAlgorithms.Linear(stack, value, scale);
 
             table.Set(key, value, VibeTable.ScalingAlgorithms.Operation.linear, scale);
@@ -375,7 +375,7 @@ namespace Vibes.Core.Tests
             if (stack <= 0) return;
 
             VibeTable table = new VibeTable();
-            Vibe key = new Vibe("key");
+            VibeKey key = new VibeKey("key");
             float expected_value = VibeTable.ScalingAlgorithms.Exponential(stack, value, scale);
 
             table.Set(key, value, VibeTable.ScalingAlgorithms.Operation.exponential, scale);
@@ -395,7 +395,7 @@ namespace Vibes.Core.Tests
             if (stack <= 0) return;
 
             VibeTable table = new VibeTable();
-            Vibe key = new Vibe("key");
+            VibeKey key = new VibeKey("key");
             float expected_value = VibeTable.ScalingAlgorithms.Hyperbolic(stack, value, scale);
 
             table.Set(key, value, VibeTable.ScalingAlgorithms.Operation.hyperbolic, scale);

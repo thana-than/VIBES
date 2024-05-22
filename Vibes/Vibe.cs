@@ -1,11 +1,11 @@
-using System;
-
-namespace Vibes.Core
+namespace Vibes
 {
-    [Serializable]
-    public readonly struct Vibe : IEquatable<Vibe>
+    /// <summary>
+    /// Immutable struct that holds the name and generated hash key of a vibe. Good for fast caching/referencing via code.
+    /// </summary>
+    public readonly struct VibeKey : IVibeKey
     {
-        public Vibe(string name)
+        public VibeKey(string name)
         {
             this.name = name;
             hash = name.GetHashCode();
@@ -16,13 +16,15 @@ namespace Vibes.Core
         public readonly int hash;
         public readonly bool isValid;
 
-        public static implicit operator int(Vibe id) => id.hash;
-        public static implicit operator string(Vibe id) => id.name;
+        public bool IsValid() => isValid;
 
-        public bool Equals(Vibe other)
+        public static implicit operator int(VibeKey id) => id.hash;
+
+        public bool Equals(IVibeKey other)
         {
-            return hash == other.hash;
+            return hash == other.GetHashCode();
         }
+
         public override int GetHashCode()
         {
             return hash;
