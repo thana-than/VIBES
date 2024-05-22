@@ -103,7 +103,7 @@ namespace Vibes.Core
             keys.Clear();
         }
 
-        struct Data
+        public struct Data
         {
             public Data(float value) : this(value, ScalingAlgorithms.Operation.linear, 1) { }
             public Data(float value, ScalingAlgorithms.Operation operation = ScalingAlgorithms.Operation.linear, float scale = 1)
