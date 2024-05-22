@@ -7,6 +7,7 @@ namespace Vibes
     public interface IVibeKey : IEquatable<IVibeKey>
     {
         int GetHashCode();
+        string ToString();
         bool IsValid();
     }
     public interface IGetVibes
