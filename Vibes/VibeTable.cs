@@ -115,11 +115,17 @@ namespace Vibes
             static readonly OperationFunc[] operations = new OperationFunc[] { Linear, Exponential, Hyperbolic };
 
             delegate float OperationFunc(float stack, float value, float scale);
-            static float Linear(float stack, float value, float scale) => value + (stack - 1) * (value * scale);
-            static float Exponential(float stack, float value, float power) => value + (float)Math.Pow((stack - 1) * value, power);
-            static float Hyperbolic(float stack, float value, float scale) => value + (1 - 1 / (1 + value * (stack - 1))) * scale;
+            public static float Linear(float stack, float value, float scale) => value + (stack - 1) * (value * scale);
+            public static float Exponential(float stack, float value, float power) => value + (float)Math.Pow((stack - 1) * value, power);
+            public static float Hyperbolic(float stack, float value, float scale) => value + (1 - 1 / (1 + value * (stack - 1))) * scale;
 
-            public static float Perform(Operation operation, float stack, float value, float scale) => operations[(int)operation](stack, value, scale);
+            public static float Perform(Operation operation, float stack, float value, float scale)
+            {
+                if (stack <= 0)
+                    return 0;
+
+                return operations[(int)operation](stack, value, scale);
+            }
         }
     }
 }
