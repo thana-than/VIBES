@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
-namespace Vibes
+namespace Vibes.Core
 {
     [Serializable]
     public class VibePool : IGetVibes, IStoreReadonlyKeys<IVibeTable>

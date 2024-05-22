@@ -1,6 +1,6 @@
 using Xunit;
 
-namespace Vibes.Tests
+namespace Vibes.Core.Tests
 {
     public class VibesTests_VibePool
     {
