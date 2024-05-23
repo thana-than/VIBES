@@ -11,6 +11,8 @@ namespace Vibes.Core
         readonly List<IVibeKey> keys = new List<IVibeKey>();
         public ReadOnlyCollection<IVibeKey> StoredKeys => keys.AsReadOnly();
 
+        public Dictionary<IVibeKey, Data> CopyData() => new Dictionary<IVibeKey, Data>(stored);
+
         public VibeTable() { }
         public VibeTable(params KeyValuePair<IVibeKey, float>[] vibes)
         {
@@ -38,18 +40,19 @@ namespace Vibes.Core
                 stored[vibe] = existing_data;
             }
         }
-        public void Set(string vibe, float baseValue) => Set(new VibeKey(vibe), baseValue);
 
-        public void Set(IVibeKey vibe, float baseValue, ScalingAlgorithms.Operation operation, float scale)
+        public void Set(IVibeKey vibe, float baseValue, ScalingAlgorithms.Operation operation, float scale) => Set(vibe, new Data(baseValue, operation, scale));
+        public void Set(string vibe, float baseValue) => Set(new VibeKey(vibe), baseValue);
+        public void Set(string vibe, float baseValue, ScalingAlgorithms.Operation operation, float scale) => Set(new VibeKey(vibe), baseValue, operation, scale);
+        public void Set(string vibe, Data data) => Set(new VibeKey(vibe), data);
+        public void Set(IVibeKey vibe, Data data)
         {
             if (!vibe.IsValid())
                 return;
 
-            Data data = new Data(baseValue, operation, scale);
             if (!TryNew(vibe, data))
                 stored[vibe] = data;
         }
-        public void Set(string vibe, float baseValue, ScalingAlgorithms.Operation operation, float scale) => Set(new VibeKey(vibe), baseValue, operation, scale);
 
         public void Add(IVibeKey vibe, float valueIncrement)
         {
@@ -102,13 +105,22 @@ namespace Vibes.Core
         }
         public float Get(string vibe, float stack) => Get(new VibeKey(vibe), stack);
 
+        public Data GetData(IVibeKey vibe)
+        {
+            if (stored.TryGetValue(vibe, out var data))
+                return data;
+
+            return null;
+        }
+        public Data GetData(string vibe) => GetData(new VibeKey(vibe));
+
         public void Clear()
         {
             stored.Clear();
             keys.Clear();
         }
 
-        public struct Data
+        public class Data
         {
             public Data(float value) : this(value, ScalingAlgorithms.Operation.linear, 1) { }
             public Data(float value, ScalingAlgorithms.Operation operation = ScalingAlgorithms.Operation.linear, float scale = 1)
