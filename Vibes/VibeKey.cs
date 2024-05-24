@@ -24,6 +24,10 @@ namespace Vibes
         {
             return hash == other.GetHashCode();
         }
+        public override bool Equals(object other)
+        {
+            return Equals(other as IVibeKey);
+        }
 
         public override int GetHashCode()
         {
