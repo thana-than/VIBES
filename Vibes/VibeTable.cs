@@ -54,6 +54,17 @@ namespace Vibes.Core
                 stored[vibe] = data;
         }
 
+        /// <summary>
+        /// Sets dictionary value without checking if vibe is valid. Should only be used in very specific cases if you know what you're doing.
+        /// </summary>
+        public void SetUnsafe(IVibeKey vibe, Data data)
+        {
+            if (!stored.ContainsKey(vibe))
+                keys.Add(vibe);
+
+            stored[vibe] = data;
+        }
+
         public void Add(IVibeKey vibe, float valueIncrement)
         {
             if (!vibe.IsValid())
@@ -82,6 +93,7 @@ namespace Vibes.Core
         {
             return stored.ContainsKey(vibe);
         }
+        public bool ContainsKey(string key) => ContainsKey(new VibeKey(key));
 
         public bool Remove(IVibeKey vibe)
         {
@@ -93,6 +105,7 @@ namespace Vibes.Core
 
             return false;
         }
+        public bool Remove(string vibe) => Remove(new VibeKey(vibe));
 
         public float Get(IVibeKey vibe) => Get(vibe, 1);
         public float Get(string vibe) => Get(new VibeKey(vibe), 1);
