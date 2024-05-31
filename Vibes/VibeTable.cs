@@ -5,13 +5,12 @@ using System.Collections.ObjectModel;
 namespace Vibes.Core
 {
     [Serializable]
-    public class VibeTable : IVibeTable, IGetVibes, ISetVibes, IStoreReadonlyKeys<IVibeKey>
+    public class VibeTable : IVibeTable, IGetVibes, ISetVibes
     {
-        readonly Dictionary<IVibeKey, Data> stored = new Dictionary<IVibeKey, Data>();
-        readonly List<IVibeKey> keys = new List<IVibeKey>();
-        public ReadOnlyCollection<IVibeKey> StoredKeys => keys.AsReadOnly();
+        protected virtual IDictionary<IVibeKey, Data> Storage { get; } = new Dictionary<IVibeKey, Data>();
 
-        public Dictionary<IVibeKey, Data> CopyData() => new Dictionary<IVibeKey, Data>(stored);
+        public Dictionary<IVibeKey, Data> CopyData() => new Dictionary<IVibeKey, Data>(Storage);
+        public int Count => Storage.Count;
 
         public VibeTable() { }
         public VibeTable(params KeyValuePair<IVibeKey, float>[] vibes)
@@ -35,9 +34,9 @@ namespace Vibes.Core
 
             if (!TryNew(vibe, new Data(baseValue)))
             {
-                Data existing_data = stored[vibe];
+                Data existing_data = Storage[vibe];
                 existing_data.value = baseValue;
-                stored[vibe] = existing_data;
+                Storage[vibe] = existing_data;
             }
         }
 
@@ -51,18 +50,27 @@ namespace Vibes.Core
                 return;
 
             if (!TryNew(vibe, data))
-                stored[vibe] = data;
+                Storage[vibe] = data;
+        }
+        public void Set(params KeyValuePair<IVibeKey, float>[] vibes)
+        {
+            int len = vibes.Length;
+            for (int i = 0; i < len; i++)
+                Set(vibes[i].Key, vibes[i].Value);
+        }
+        public void Set(params KeyValuePair<string, float>[] vibes)
+        {
+            int len = vibes.Length;
+            for (int i = 0; i < len; i++)
+                Set(vibes[i].Key, vibes[i].Value);
         }
 
         /// <summary>
         /// Sets dictionary value without checking if vibe is valid. Should only be used in very specific cases if you know what you're doing.
         /// </summary>
-        public void SetUnsafe(IVibeKey vibe, Data data)
+        protected void SetUnsafe(IVibeKey vibe, Data data)
         {
-            if (!stored.ContainsKey(vibe))
-                keys.Add(vibe);
-
-            stored[vibe] = data;
+            Storage[vibe] = data;
         }
 
         public void Add(IVibeKey vibe, float valueIncrement)
@@ -72,9 +80,9 @@ namespace Vibes.Core
 
             if (!TryNew(vibe, new Data(valueIncrement)))
             {
-                Data existing_data = stored[vibe];
+                Data existing_data = Storage[vibe];
                 existing_data.value += valueIncrement;
-                stored[vibe] = existing_data;
+                Storage[vibe] = existing_data;
             }
         }
         public void Add(string vibe, float valueIncrement) => Add(new VibeKey(vibe), valueIncrement);
@@ -84,26 +92,20 @@ namespace Vibes.Core
             if (ContainsKey(vibe))
                 return false;
 
-            stored.Add(vibe, data);
-            keys.Add(vibe);
+            Storage.Add(vibe, data);
+            // keys.Add(vibe);
             return true;
         }
 
         public bool ContainsKey(IVibeKey vibe)
         {
-            return stored.ContainsKey(vibe);
+            return Storage.ContainsKey(vibe);
         }
         public bool ContainsKey(string key) => ContainsKey(new VibeKey(key));
 
         public bool Remove(IVibeKey vibe)
         {
-            if (stored.Remove(vibe))
-            {
-                keys.Remove(vibe);
-                return true;
-            }
-
-            return false;
+            return Storage.Remove(vibe);
         }
         public bool Remove(string vibe) => Remove(new VibeKey(vibe));
 
@@ -111,7 +113,7 @@ namespace Vibes.Core
         public float Get(string vibe) => Get(new VibeKey(vibe), 1);
         public float Get(IVibeKey vibe, float stack)
         {
-            if (stored.TryGetValue(vibe, out var data))
+            if (Storage.TryGetValue(vibe, out var data))
                 return data.GetValue(stack);
 
             return 0;
@@ -120,7 +122,7 @@ namespace Vibes.Core
 
         public Data GetData(IVibeKey vibe)
         {
-            if (stored.TryGetValue(vibe, out var data))
+            if (Storage.TryGetValue(vibe, out var data))
                 return data;
 
             return null;
@@ -129,10 +131,10 @@ namespace Vibes.Core
 
         public void Clear()
         {
-            stored.Clear();
-            keys.Clear();
+            Storage.Clear();
         }
 
+        [Serializable]
         public class Data
         {
             public Data(float value) : this(value, ScalingAlgorithms.Operation.linear, 1) { }

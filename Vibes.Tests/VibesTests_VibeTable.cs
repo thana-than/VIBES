@@ -182,7 +182,7 @@ namespace Vibes.Core.Tests
             VibeTable table = new VibeTable(vibeFloatPair);
             table.Clear();
 
-            Assert.True(table.StoredKeys.Count == 0, "Table had keys cleared. Is now empty and returned count should be zero.");
+            Assert.True(table.Count == 0, "Table had keys cleared. Is now empty and returned count should be zero.");
         }
 
         #endregion
@@ -241,7 +241,7 @@ namespace Vibes.Core.Tests
             for (int i = 0; i < keyCount; i++)
                 table.Add(new VibeKey(i.ToString()), 1); //*Unique keys are simply current index
 
-            Assert.True(table.StoredKeys.Count == keyCount, "StoredKeys should start with given count");
+            Assert.True(table.Count == keyCount, "StoredKeys should start with given count");
         }
 
         [Theory]
@@ -257,7 +257,7 @@ namespace Vibes.Core.Tests
             for (int i = 0; i < keyCount; i++)
                 table.Add(key, 1);
 
-            Assert.True(table.StoredKeys.Count == 1, "All added keys were duplicate, should only return 1 table addition.");
+            Assert.True(table.Count == 1, "All added keys were duplicate, should only return 1 table addition.");
 
             Assert.Equal(keyCount, table.Get(key)); //*Every key added should add 1 value instead of adding the same key to storage
         }
@@ -279,7 +279,7 @@ namespace Vibes.Core.Tests
             for (int i = 0; i < removals; i++)
                 table.Remove(new VibeKey(i.ToString())); //*Remove keys starting from 0 towards removals int
 
-            Assert.True(table.StoredKeys.Count == difference, "StoredKeys.Count should be equal to the difference between the additions and removals to the table.");
+            Assert.True(table.Count == difference, "StoredKeys.Count should be equal to the difference between the additions and removals to the table.");
         }
 
         #endregion
