@@ -18,6 +18,15 @@ namespace Vibes.Core.Tests
             Assert.True(constructed_vibe.isValid, "Properly constructed vibe should be valid.");
         }
 
+        [Fact]
+        public void Test_VibeKeyBothInvalid_Equal()
+        {
+            VibeKey key1 = new VibeKey();
+            VibeKey key2 = new VibeKey();
+
+            Assert.True(key1 == key2, "Both keys are invalid and should match.");
+        }
+
         [Theory]
         [InlineData("key")]
         [InlineData("check")]

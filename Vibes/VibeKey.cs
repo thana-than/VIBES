@@ -7,32 +7,34 @@ namespace Vibes
     {
         public VibeKey(string name)
         {
-            this.name = name;
-            hash = name.GetHashCode();
+            Name = name;
+            Hash = VibesUtility.NameToHash(name);
             isValid = true;
         }
-        public string Name => name;
-        public int Hash => hash;
 
-        public readonly string name;
-        public readonly int hash;
+        public VibeKey(IVibeKey key)
+        {
+            Name = key.Name;
+            Hash = key.Hash;
+            isValid = key.IsValid();
+        }
+
+        public string Name { get; }
+        public int Hash { get; }
+
         public readonly bool isValid;
 
         public bool IsValid() => isValid;
 
-        public static implicit operator int(VibeKey id) => id.hash;
+        public static implicit operator int(VibeKey id) => id.Hash;
 
         public bool Equals(IVibeKey other)
         {
-            if (ReferenceEquals(other, null)) return false;
-
-            return hash == other.GetHashCode();
+            return Hash == other.Hash;
         }
 
         public static bool operator ==(VibeKey v1, IVibeKey v2)
         {
-            if (ReferenceEquals(v1, null)) return ReferenceEquals(v2, null);
-
             return v1.Equals(v2);
         }
 
@@ -48,11 +50,11 @@ namespace Vibes
 
         public override int GetHashCode()
         {
-            return hash;
+            return Hash;
         }
         public override string ToString()
         {
-            return name;
+            return Name;
         }
     }
 }
