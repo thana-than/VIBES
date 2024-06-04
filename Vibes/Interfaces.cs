@@ -14,6 +14,12 @@ namespace Vibes
     {
         float Get(IVibeKey vibe);
     }
+
+    public interface IGetStacks
+    {
+        float Get(IVibeKey vibe, float stacks);
+    }
+
     public interface IStoreReadonlyKeys<T>
     {
         ReadOnlyCollection<T> StoredKeys { get; }
@@ -22,8 +28,5 @@ namespace Vibes
     {
         void Set(IVibeKey vibe, float baseValue);
     }
-    public interface IVibeTable
-    {
-        float Get(IVibeKey vibe, float stacks);
-    }
+    public interface IVibeTable : IGetStacks { }
 }
