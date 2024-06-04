@@ -145,9 +145,9 @@ namespace Vibes.Core
                 this.operation = operation;
             }
 
-            public float value;
-            public float scale;
-            public ScalingAlgorithms.Operation operation;
+            public float value = 1;
+            public float scale = 1;
+            public ScalingAlgorithms.Operation operation = ScalingAlgorithms.Operation.linear;
 
             public float GetValue(float stack) => ScalingAlgorithms.Perform(operation, stack, value, scale);
         }
