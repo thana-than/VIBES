@@ -134,6 +134,35 @@ namespace Vibes.Core
             Storage.Clear();
         }
 
+        public override int GetHashCode()
+        {
+            return Storage.GetHashCode();
+        }
+
+        public bool Equals(IVibeTable other)
+        {
+            if (ReferenceEquals(other, null)) return false;
+
+            return GetHashCode() == other.GetHashCode();
+        }
+
+        public static bool operator ==(VibeTable v1, IVibeTable v2)
+        {
+            if (ReferenceEquals(v1, null)) return ReferenceEquals(v2, null);
+
+            return v1.Equals(v2);
+        }
+
+        public static bool operator !=(VibeTable p1, IVibeTable p2)
+        {
+            return !(p1 == p2);
+        }
+
+        public override bool Equals(object obj)
+        {
+            return Equals(obj as IVibeTable);
+        }
+
         [Serializable]
         public class Data
         {
