@@ -1,5 +1,6 @@
 using System;
 using System.Collections.ObjectModel;
+using System.Collections.Generic;
 using Vibes.Core;
 
 namespace Vibes
@@ -28,5 +29,9 @@ namespace Vibes
     {
         void Set(IVibeKey vibe, float baseValue);
     }
-    public interface IVibeTable : IGetStacks { }
+
+    public interface IVibeTable : IGetStacks, IEquatable<IVibeTable>
+    {
+        IEnumerable<KeyValuePair<IVibeKey, VibeTable.Data>> GetTableData();
+    }
 }

@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 
 namespace Vibes.Core
 {
@@ -8,8 +7,7 @@ namespace Vibes.Core
     public class VibeTable : IVibeTable, IGetVibes, ISetVibes
     {
         protected virtual IDictionary<IVibeKey, Data> Storage { get; } = new Dictionary<IVibeKey, Data>();
-
-        public Dictionary<IVibeKey, Data> CopyData() => new Dictionary<IVibeKey, Data>(Storage);
+        public IEnumerable<KeyValuePair<IVibeKey, Data>> GetTableData() => Storage;
         public int Count => Storage.Count;
 
         public VibeTable() { }
