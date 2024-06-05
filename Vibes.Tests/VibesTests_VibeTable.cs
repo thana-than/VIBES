@@ -46,6 +46,23 @@ namespace Vibes.Core.Tests
         [InlineData("zero", 0)]
         [InlineData("maxValue", float.MaxValue)]
         [InlineData("minValue", float.MinValue)]
+        public void Test_TableConstructIVibeTable_ReturnsSameValue(string set_key, float value)
+        {
+            VibeTable table = new VibeTable();
+            table.Add(set_key, value);
+
+            VibeTable clonedTable = new VibeTable((IVibeTable)table);
+
+            float return_clone = clonedTable.Get(set_key);
+            Assert.Equal(value, return_clone);
+        }
+
+        [Theory]
+        [InlineData("one", 1)]
+        [InlineData("negativeOne", -1)]
+        [InlineData("zero", 0)]
+        [InlineData("maxValue", float.MaxValue)]
+        [InlineData("minValue", float.MinValue)]
         public void Test_TableSet_ReturnsGivenValue(string key, float value)
         {
             VibeTable table = new VibeTable();
