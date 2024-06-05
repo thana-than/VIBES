@@ -25,6 +25,14 @@ namespace Vibes.Core
                 Add(vibes[i].Key, vibes[i].Value);
         }
 
+        public VibeTable(IEnumerable<KeyValuePair<IVibeKey, Data>> vibes)
+        {
+            foreach (var v in vibes)
+                Set(v.Key, v.Value);
+        }
+
+        public VibeTable(IVibeTable table) : this(table.GetTableData()) { }
+
         public void Set(IVibeKey vibe, float baseValue)
         {
             if (!vibe.IsValid())
