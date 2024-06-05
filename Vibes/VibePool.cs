@@ -7,8 +7,8 @@ namespace Vibes.Core
     [Serializable]
     public class VibePool : IGetVibes, IStoreReadonlyKeys<IVibeTable>
     {
-        readonly Dictionary<IVibeTable, float> tableData = new Dictionary<IVibeTable, float>();
-        readonly List<IVibeTable> tableKeys = new List<IVibeTable>();
+        protected readonly Dictionary<IVibeTable, float> tableData = new Dictionary<IVibeTable, float>();
+        protected readonly List<IVibeTable> tableKeys = new List<IVibeTable>();
         public ReadOnlyCollection<IVibeTable> StoredKeys => tableKeys.AsReadOnly();
         bool StacksValid(float stacks) => stacks > 0;
 
