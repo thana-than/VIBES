@@ -142,10 +142,10 @@ namespace Vibes.Core
 
         public override int GetHashCode()
         {
-            return Storage.GetHashCode();
+            return base.GetHashCode();
         }
 
-        public bool Equals(IVibeTable other)
+        public virtual bool Equals(IVibeTable other)
         {
             if (ReferenceEquals(other, null)) return false;
 

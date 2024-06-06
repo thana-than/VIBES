@@ -10,6 +10,8 @@ namespace Vibes
         int Hash { get; }
         string Name { get; }
         bool IsValid();
+        int GetHashCode();
+        bool Equals(object obj);
     }
     public interface IGetVibes
     {
@@ -33,5 +35,7 @@ namespace Vibes
     public interface IVibeTable : IGetStacks, IEquatable<IVibeTable>
     {
         IEnumerable<KeyValuePair<IVibeKey, VibeTable.Data>> GetTableData();
+        int GetHashCode();
+        bool Equals(object obj);
     }
 }
