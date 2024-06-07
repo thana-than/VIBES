@@ -38,12 +38,7 @@ namespace Vibes.Core
             if (!vibe.IsValid())
                 return;
 
-            if (!TryNew(vibe, new Data(baseValue)))
-            {
-                Data existing_data = Storage[vibe];
-                existing_data.value = baseValue;
-                Storage[vibe] = existing_data;
-            }
+            SetUnsafe(vibe, baseValue);
         }
 
         public void Set(IVibeKey vibe, float baseValue, ScalingAlgorithms.Operation operation, float scale) => Set(vibe, new Data(baseValue, operation, scale));
@@ -56,7 +51,7 @@ namespace Vibes.Core
                 return;
 
             if (!TryNew(vibe, data))
-                Storage[vibe] = data;
+                SetUnsafe(vibe, data);
         }
         public void Set(params KeyValuePair<IVibeKey, float>[] vibes)
         {
@@ -71,19 +66,42 @@ namespace Vibes.Core
                 Set(vibes[i].Key, vibes[i].Value);
         }
 
-        /// <summary>
-        /// Sets dictionary value without checking if vibe is valid. Should only be used in very specific cases if you know what you're doing.
-        /// </summary>
-        protected void SetUnsafe(IVibeKey vibe, Data data)
-        {
-            Storage[vibe] = data;
-        }
-
         public void Add(IVibeKey vibe, float valueIncrement)
         {
             if (!vibe.IsValid())
                 return;
 
+            AddUnsafe(vibe, valueIncrement);
+        }
+        public void Add(string vibe, float valueIncrement) => Add(new VibeKey(vibe), valueIncrement);
+
+        /// <summary>
+        /// Sets dictionary value without checking if vibe is valid. Should only be used in very specific cases if you know what you're doing.
+        /// </summary>
+        protected void SetUnsafe(IVibeKey vibe, Data data)
+        {
+            Storage.Remove(vibe); //*Remove the previous key in case we need THIS instance of the key (in situations where this key could change)
+            Storage[vibe] = data;
+        }
+
+        /// <summary>
+        /// Sets dictionary value without checking if vibe is valid. Should only be used in very specific cases if you know what you're doing.
+        /// </summary>
+        void SetUnsafe(IVibeKey vibe, float baseValue)
+        {
+            if (!TryNew(vibe, new Data(baseValue)))
+            {
+                Data existing_data = Storage[vibe];
+                existing_data.value = baseValue;
+                SetUnsafe(vibe, existing_data);
+            }
+        }
+
+        /// <summary>
+        /// Adds dictionary value without checking if vibe is valid. Should only be used in very specific cases if you know what you're doing.
+        /// </summary>
+        protected void AddUnsafe(IVibeKey vibe, float valueIncrement)
+        {
             if (!TryNew(vibe, new Data(valueIncrement)))
             {
                 Data existing_data = Storage[vibe];
@@ -91,7 +109,6 @@ namespace Vibes.Core
                 Storage[vibe] = existing_data;
             }
         }
-        public void Add(string vibe, float valueIncrement) => Add(new VibeKey(vibe), valueIncrement);
 
         bool TryNew(IVibeKey vibe, Data data)
         {
@@ -99,7 +116,6 @@ namespace Vibes.Core
                 return false;
 
             Storage.Add(vibe, data);
-            // keys.Add(vibe);
             return true;
         }
 
@@ -119,21 +135,43 @@ namespace Vibes.Core
         public float Get(string vibe) => Get(new VibeKey(vibe), 1);
         public float Get(IVibeKey vibe, float stack)
         {
+            if (!vibe.IsValid())
+                return 0;
+
+            return GetUnsafe(vibe, stack);
+        }
+        public float Get(string vibe, float stack) => Get(new VibeKey(vibe), stack);
+
+        /// <summary>
+        /// Retrieves the value stored here from a vibe key even if the key is invalid.
+        /// </summary>
+        public float GetUnsafe(IVibeKey vibe, float stack)
+        {
             if (Storage.TryGetValue(vibe, out var data))
                 return data.GetValue(stack);
 
             return 0;
         }
-        public float Get(string vibe, float stack) => Get(new VibeKey(vibe), stack);
 
         public Data GetData(IVibeKey vibe)
+        {
+            if (!vibe.IsValid())
+                return null;
+
+            return GetDataUnsafe(vibe);
+        }
+        public Data GetData(string vibe) => GetData(new VibeKey(vibe));
+
+        /// <summary>
+        /// Retrieves data stored here from a vibe key even if the key is invalid.
+        /// </summary>
+        public Data GetDataUnsafe(IVibeKey vibe)
         {
             if (Storage.TryGetValue(vibe, out var data))
                 return data;
 
             return null;
         }
-        public Data GetData(string vibe) => GetData(new VibeKey(vibe));
 
         public void Clear()
         {
