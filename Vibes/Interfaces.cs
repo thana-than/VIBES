@@ -23,6 +23,13 @@ namespace Vibes
         float Get(IVibeKey vibe, float stacks);
     }
 
+    public interface IModifyStacks
+    {
+        void Set(IVibeTable vibe, float stacks);
+        void Add(IVibeTable vibe, float stacks);
+        bool Remove(IVibeTable vibe);
+    }
+
     public interface IStoreReadonlyKeys<T>
     {
         ReadOnlyCollection<T> StoredKeys { get; }
@@ -37,5 +44,11 @@ namespace Vibes
         IEnumerable<KeyValuePair<IVibeKey, VibeTable.Data>> GetTableData();
         int GetHashCode();
         bool Equals(object obj);
+    }
+
+    public interface IVibePool : IGetVibes, IStoreReadonlyKeys<IVibeTable>, IModifyStacks
+    {
+        int GetAllPoolData(ref List<KeyValuePair<IVibeKey, float>> dataOut);
+        float GetStacks(IVibeTable tableKey);
     }
 }

@@ -5,12 +5,12 @@ using System.Collections.ObjectModel;
 namespace Vibes.Core
 {
     [Serializable]
-    public class VibePool : IGetVibes, IStoreReadonlyKeys<IVibeTable>
+    public class VibePool : IVibePool
     {
         protected readonly Dictionary<IVibeTable, float> tableData = new Dictionary<IVibeTable, float>();
         protected readonly List<IVibeTable> tableKeys = new List<IVibeTable>();
         public ReadOnlyCollection<IVibeTable> StoredKeys => tableKeys.AsReadOnly();
-        bool StacksValid(float stacks) => stacks > 0;
+        public static bool StacksValid(float stacks) => stacks > 0;
 
         public VibePool() { }
         public VibePool(params IVibeTable[] tables)
