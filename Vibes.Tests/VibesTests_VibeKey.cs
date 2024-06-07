@@ -12,6 +12,13 @@ namespace Vibes.Core.Tests
         }
 
         [Fact]
+        public void Test_VibeDefaultConstructor_InvalidName_ReturnInvalid()
+        {
+            VibeKey invalidKey_vibe = new VibeKey(VibeKey.INVALID_KEY_NAME);
+            Assert.False(invalidKey_vibe.isValid, "Vibe constructor with name parameter " + VibeKey.INVALID_KEY_NAME + " should remain invalid.");
+        }
+
+        [Fact]
         public void Test_VibeKeyConstructor_ReturnValid()
         {
             VibeKey constructed_vibe = new VibeKey("TestVibe");

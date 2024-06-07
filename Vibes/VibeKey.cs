@@ -10,6 +10,12 @@ namespace Vibes
             Name = name;
             Hash = VibesUtility.NameToHash(name);
             isValid = true;
+
+            if (Hash == INVALID_KEY_STRING_TEST_HASH)
+            {
+                Hash = INVALID_HASH;
+                isValid = false;
+            }
         }
 
         public VibeKey(IVibeKey key)
@@ -18,6 +24,12 @@ namespace Vibes
             Hash = key.Hash;
             isValid = key.IsValid();
         }
+
+        public const string INVALID_KEY_NAME = "_INVALID_";
+        public static readonly int INVALID_HASH = VibesUtility.NameToHash("");
+        public static readonly int INVALID_KEY_STRING_TEST_HASH = VibesUtility.NameToHash(INVALID_KEY_NAME);
+
+        public static readonly VibeKey INVALID_KEY = new VibeKey(INVALID_KEY_NAME);
 
         public string Name { get; }
         public int Hash { get; }

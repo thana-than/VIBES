@@ -1,3 +1,5 @@
+using System;
+
 namespace Vibes.Core
 {
     /// <summary>
@@ -14,21 +16,24 @@ namespace Vibes.Core
         public VibeKeyObject(IVibeKey key)
         {
             name = key.Name;
-            hash = key.IsValid() ? key.Hash : VibesUtility.NameToHash(Name);
+            hash = key.Hash;
         }
 
         string name;
-        int hash;
+        int hash = VibeKey.INVALID_HASH;
 
         public void RegenerateHash()
         {
             hash = VibesUtility.NameToHash(Name);
+
+            if (Hash == VibeKey.INVALID_KEY_STRING_TEST_HASH)
+                hash = VibeKey.INVALID_HASH;
         }
 
         public string Name { get { return name; } set { name = value; RegenerateHash(); } }
         public int Hash => hash;
 
-        public bool IsValid() => true;
+        public bool IsValid() => hash != VibeKey.INVALID_HASH;
 
         public static implicit operator int(VibeKeyObject id) => id.Hash;
 
