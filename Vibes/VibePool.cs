@@ -118,6 +118,42 @@ namespace Vibes.Core
             return sum;
         }
 
+        ///<summary>Collects all keys in all pooled tables and calculates their total value. Expensive!</summary>
+        public int GetAllPoolData(ref List<KeyValuePair<IVibeKey, float>> dataOut)
+        {
+            dataOut.Clear();
+            int dataOutCount = 0;
+
+            int poolSize = tableKeys.Count;
+            for (int i = 0; i < poolSize; i++)
+            {
+                IVibeTable table = tableKeys[i];
+                float stacks = GetStacks(table);
+
+                var data = table.GetTableData();
+                foreach (var keyData in data)
+                {
+                    IVibeKey key = keyData.Key;
+                    float updatedValue = table.Get(key, stacks);
+                    int existingIndex = dataOut.FindIndex(p => p.Key.Equals(key));
+                    if (existingIndex < 0)
+                    {
+                        //*Add a new key
+                        dataOutCount++;
+                        dataOut.Add(new KeyValuePair<IVibeKey, float>(key, updatedValue));
+                    }
+                    else
+                    {
+                        //*Add value to existing key
+                        var existing = dataOut[existingIndex];
+                        dataOut[existingIndex] = new KeyValuePair<IVibeKey, float>(key, existing.Value + updatedValue);
+                    }
+                }
+            }
+
+            return dataOutCount;
+        }
+
         public float GetStacks(IVibeTable tableKey)
         {
             if (tableData.TryGetValue(tableKey, out float stacks))
