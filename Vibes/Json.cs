@@ -12,18 +12,7 @@ namespace Vibes
         public class IVibeKeyConverter : JsonConverter
         {
             //* We use reflection to cast our vibekey into the proper type, and cache the constructor so that reflection isn't used over and over again
-            private static readonly Dictionary<Type, ConstructorInfo> ConstructorCache = new Dictionary<Type, ConstructorInfo>();
-            static readonly Type[] CONSTRUCTOR_TYPE = new[] { typeof(string) };
-            static ConstructorInfo RetrieveConstructor(Type objectType)
-            {
-                if (!ConstructorCache.TryGetValue(objectType, out var constructor))
-                {
-                    constructor = objectType.GetConstructor(CONSTRUCTOR_TYPE);
-                    ConstructorCache[objectType] = constructor;
-                }
-
-                return constructor;
-            }
+            private static ConstructorCache constructors = new ConstructorCache(new[] { typeof(string) });
 
             public static string ReadKey(JsonReader reader)
             {
@@ -37,16 +26,36 @@ namespace Vibes
                 obj.WriteTo(writer);
             }
 
-            public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
-            {
-                var constructor = RetrieveConstructor(objectType);
-                var key = new object[] { ReadKey(reader) };
-                object obj = constructor.Invoke(key);
-
-                return obj;
-            }
+            public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer) { return constructors.Invoke(objectType, ReadKey(reader)); }
             public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer) { WriteKey(writer, (IVibeKey)value); }
-            public override bool CanConvert(Type objectType) { return typeof(IVibeKey).IsAssignableFrom(objectType) && RetrieveConstructor(objectType) != null; }
+            public override bool CanConvert(Type objectType) { return typeof(IVibeKey).IsAssignableFrom(objectType) && constructors.Retrieve(objectType) != null; }
         }
+
+        #region Helpers
+
+        ///<summary>Allows us to retrieve specific type constructors using reflection, then cache them for performance.</summary>
+        public class ConstructorCache
+        {
+            public ConstructorCache(params Type[] constructorType) { this.constructorType = constructorType; }
+            readonly Dictionary<Type, ConstructorInfo> cache = new Dictionary<Type, ConstructorInfo>();
+            readonly Type[] constructorType;
+            public ConstructorInfo Retrieve(Type objectType)
+            {
+                if (!cache.TryGetValue(objectType, out var constructor))
+                {
+                    constructor = objectType.GetConstructor(constructorType);
+                    cache[objectType] = constructor;
+                }
+
+                return constructor;
+            }
+
+            public object Invoke(Type objectType, params object[] parameters)
+            {
+                return Retrieve(objectType).Invoke(parameters);
+            }
+        }
+
+        #endregion
     }
 }
