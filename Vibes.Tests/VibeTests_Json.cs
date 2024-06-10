@@ -1,4 +1,3 @@
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Xunit;
 
@@ -21,7 +20,7 @@ namespace Vibes.Core.Tests.Json
             var preSerializedKey = CreateKey(key);
             Assert.Equal(key, preSerializedKey.Name); //* name should match string
 
-            string json = JsonConvert.SerializeObject(preSerializedKey);
+            string json = Vibes.Json.SerializeKey(preSerializedKey);
             JObject jObject = JObject.Parse(json);
 
             Assert.True(jObject.Count == 1, "VibeKey Json should only have one property: " + Vibes.Json.JSON_NAME);
@@ -35,8 +34,8 @@ namespace Vibes.Core.Tests.Json
         [InlineData(VibeKey.INVALID_KEY_NAME)]
         public void Test_VibeKeyDeserialization(string key)
         {
-            string json = JsonConvert.SerializeObject(CreateKey(key));
-            var vibeKey = JsonConvert.DeserializeObject<T>(json);
+            string json = Vibes.Json.SerializeKey(CreateKey(key));
+            var vibeKey = Vibes.Json.DeserializeKey<T>(json);
 
             Assert.Equal(key, vibeKey.Name);
         }
@@ -70,7 +69,7 @@ namespace Vibes.Core.Tests.Json
             var tableData = GenerateTableData(tableSize);
             VibeTable table = new VibeTable(tableData);
 
-            string json = JsonConvert.SerializeObject(table);
+            string json = Vibes.Json.SerializeTable(table);
             JObject obj = JObject.Parse(json);
             JArray array = (JArray)obj[Vibes.Json.JSON_TABLEDATA];
 
@@ -98,8 +97,8 @@ namespace Vibes.Core.Tests.Json
         {
             var tableData = GenerateTableData(tableSize);
             VibeTable table = new VibeTable(tableData);
-            string json = JsonConvert.SerializeObject(table);
-            var newTable = JsonConvert.DeserializeObject<VibeTable>(json);
+            string json = Vibes.Json.SerializeTable(table);
+            var newTable = Vibes.Json.DeserializeTable<VibeTable>(json);
 
             Assert.True(newTable.Count == tableSize, "Table should be the same size as given parameter " + tableSize);
             foreach (var originalItem in tableData)

@@ -10,6 +10,15 @@ namespace Vibes
 {
     public static class Json
     {
+        #region Public Serializers
+        public static string SerializeKey(IVibeKey key) => JsonConvert.SerializeObject(key);
+        public static T DeserializeKey<T>(string json) where T : IVibeKey => JsonConvert.DeserializeObject<T>(json);
+
+        public static string SerializeTable(IVibeTable table) => JsonConvert.SerializeObject(table);
+        public static T DeserializeTable<T>(string json) where T : IVibeTable => JsonConvert.DeserializeObject<T>(json);
+        #endregion
+
+        #region Fields
         public const string JSON_NAME = "Name";
         public const string JSON_TABLEDATA = "TableData";
         public const string JSON_TABLEDATA_KEY = "Key";
@@ -17,7 +26,9 @@ namespace Vibes
 
         private readonly static ConstructorCache key_constructors = new ConstructorCache(new[] { typeof(string) });
         private readonly static ConstructorCache table_constructors = new ConstructorCache(new[] { typeof(IEnumerable<KeyValuePair<IVibeKey, VibeTable.Data>>) });
+        #endregion
 
+        #region JsonConverters
         public class IVibeKeyConverter : JsonConverter
         {
             public static string ReadKey(JsonReader reader)
@@ -87,6 +98,7 @@ namespace Vibes
             public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer) { WriteTable(writer, (IVibeTable)value); }
         }
 
+        #endregion
         #region Helpers
 
         ///<summary>Allows us to retrieve specific type constructors using reflection, then cache them for performance.</summary>
