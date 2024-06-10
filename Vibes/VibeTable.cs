@@ -1,9 +1,12 @@
 using System;
 using System.Collections.Generic;
+using Newtonsoft.Json;
 
 namespace Vibes.Core
 {
+    //TODO Table id for checking and serialization
     [Serializable]
+    [JsonConverter(typeof(Json.IVibeTableConverter))]
     public class VibeTable : IVibeTable, IGetVibes, ISetVibes
     {
         protected virtual IDictionary<IVibeKey, Data> Storage { get; } = new Dictionary<IVibeKey, Data>();
@@ -23,6 +26,12 @@ namespace Vibes.Core
             int len = vibes.Length;
             for (int i = 0; i < len; i++)
                 Add(vibes[i].Key, vibes[i].Value);
+        }
+
+        public VibeTable(params KeyValuePair<IVibeKey, Data>[] vibes)
+        {
+            foreach (var v in vibes)
+                Set(v.Key, v.Value);
         }
 
         public VibeTable(IEnumerable<KeyValuePair<IVibeKey, Data>> vibes)
@@ -208,8 +217,9 @@ namespace Vibes.Core
         }
 
         [Serializable]
-        public class Data
+        public class Data : IEquatable<Data>
         {
+            public Data() : this(0) { }
             public Data(float value) : this(value, ScalingAlgorithms.Operation.linear, 1) { }
             public Data(float value, ScalingAlgorithms.Operation operation = ScalingAlgorithms.Operation.linear, float scale = 1)
             {
@@ -223,6 +233,11 @@ namespace Vibes.Core
             public ScalingAlgorithms.Operation operation = ScalingAlgorithms.Operation.linear;
 
             public float GetValue(float stack) => ScalingAlgorithms.Perform(operation, stack, value, scale);
+
+            public bool Equals(Data other)
+            {
+                return value == other.value && scale == other.scale && operation == other.operation;
+            }
         }
 
         public static class ScalingAlgorithms

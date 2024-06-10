@@ -24,9 +24,9 @@ namespace Vibes.Core.Tests.Json
             string json = JsonConvert.SerializeObject(preSerializedKey);
             JObject jObject = JObject.Parse(json);
 
-            Assert.True(jObject.Count == 1, "VibeKey Json should only have one property: " + Vibes.Json.NAME_KEY);
-            Assert.True(jObject[Vibes.Json.NAME_KEY] != null, "VibeKey Json's property should be named: " + Vibes.Json.NAME_KEY);
-            Assert.Equal(key, jObject[Vibes.Json.NAME_KEY].ToString()); //*Name should be the same
+            Assert.True(jObject.Count == 1, "VibeKey Json should only have one property: " + Vibes.Json.JSON_NAME);
+            Assert.True(jObject[Vibes.Json.JSON_NAME] != null, "VibeKey Json's property should be named: " + Vibes.Json.JSON_NAME);
+            Assert.Equal(key, jObject[Vibes.Json.JSON_NAME].ToString()); //*Name should be the same
         }
 
         [Theory]
@@ -43,4 +43,70 @@ namespace Vibes.Core.Tests.Json
     }
 
     #endregion
+
+    public class VibeTests_VibeTableJson
+    {
+        Random random = new Random();
+        Array operationValues = Enum.GetValues(typeof(VibeTable.ScalingAlgorithms.Operation));
+        KeyValuePair<IVibeKey, VibeTable.Data>[] GenerateTableData(int tableSize)
+        {
+            var tableData = new KeyValuePair<IVibeKey, VibeTable.Data>[tableSize];
+            for (int i = 0; i < tableSize; i++)
+            {
+                var key = new VibeKey("key_" + i);
+                var value = new VibeTable.Data()
+                { value = i, scale = i * 10, operation = (VibeTable.ScalingAlgorithms.Operation)operationValues.GetValue(random.Next(operationValues.Length)) };
+                tableData[i] = new(key, value);
+            }
+            return tableData;
+        }
+
+        [Theory]
+        [InlineData(0)]
+        [InlineData(1)]
+        [InlineData(10)]
+        public void Test_VibeTableSerialization(int tableSize)
+        {
+            var tableData = GenerateTableData(tableSize);
+            VibeTable table = new VibeTable(tableData);
+
+            string json = JsonConvert.SerializeObject(table);
+            JObject obj = JObject.Parse(json);
+            JArray array = (JArray)obj[Vibes.Json.JSON_TABLEDATA];
+
+            //*Validate data
+            Assert.True(array.Count == tableSize, "Table should be the same size as given parameter " + tableSize);
+            for (int i = 0; i < tableSize; i++)
+            {
+                const string KEY = Vibes.Json.JSON_TABLEDATA_KEY;
+                Assert.Equal(array[i][KEY][Vibes.Json.JSON_NAME], tableData[i].Key.Name);
+
+                const string VALUE = Vibes.Json.JSON_TABLEDATA_DATA;
+                const int DATA_PARAMS = 3;
+                Assert.True(array[i][VALUE].Count() == DATA_PARAMS, "Data should only hold " + DATA_PARAMS + " parameters.");
+                Assert.Equal(array[i][VALUE][nameof(VibeTable.Data.value)], tableData[i].Value.value);
+                Assert.Equal(array[i][VALUE][nameof(VibeTable.Data.scale)], tableData[i].Value.scale);
+                Assert.Equal(array[i][VALUE][nameof(VibeTable.Data.operation)], (int)tableData[i].Value.operation);
+            }
+        }
+
+        [Theory]
+        [InlineData(0)]
+        [InlineData(1)]
+        [InlineData(10)]
+        public void Test_VibeTableDeserialization(int tableSize)
+        {
+            var tableData = GenerateTableData(tableSize);
+            VibeTable table = new VibeTable(tableData);
+            string json = JsonConvert.SerializeObject(table);
+            var newTable = JsonConvert.DeserializeObject<VibeTable>(json);
+
+            Assert.True(newTable.Count == tableSize, "Table should be the same size as given parameter " + tableSize);
+            foreach (var originalItem in tableData)
+            {
+                Assert.Equal(originalItem.Value, newTable.GetData(originalItem.Key));
+            }
+            //Assert.Equal(table, newTable); //TODO actual equality check between object instances
+        }
+    }
 }
