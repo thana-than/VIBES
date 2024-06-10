@@ -36,6 +36,8 @@ namespace Vibes.Core
         public bool IsValid() => hash != VibeKey.INVALID_HASH;
 
         public static implicit operator int(VibeKeyObject id) => id.Hash;
+        public static implicit operator VibeKey(VibeKeyObject key) => new VibeKey(key);
+        public static implicit operator VibeKeyObject(VibeKey key) => new VibeKeyObject(key);
 
         public bool Equals(IVibeKey other)
         {
