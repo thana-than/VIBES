@@ -6,7 +6,7 @@ namespace Vibes.Core
     /// Mutable class that holds the name and generated hash key of a vibe. Good for dynamic referencing / serialization.
     /// </summary>
     [System.Serializable]
-    [JsonConverter(typeof(Json.IVibeKeyObjectConverter))]
+    [JsonConverter(typeof(Json.IVibeKeyConverter))]
     public class VibeKeyObject : IVibeKey
     {
         public VibeKeyObject(string name)
