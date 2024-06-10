@@ -34,7 +34,7 @@ namespace Vibes
         #region Helpers
 
         ///<summary>Allows us to retrieve specific type constructors using reflection, then cache them for performance.</summary>
-        private class ConstructorCache
+        internal class ConstructorCache
         {
             public ConstructorCache(params Type[] constructorType) { this.constructorType = constructorType; }
             readonly Dictionary<Type, ConstructorInfo> cache = new Dictionary<Type, ConstructorInfo>();
