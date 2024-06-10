@@ -1,4 +1,4 @@
-using System;
+using Newtonsoft.Json;
 
 namespace Vibes.Core
 {
@@ -6,6 +6,7 @@ namespace Vibes.Core
     /// Mutable class that holds the name and generated hash key of a vibe. Good for dynamic referencing / serialization.
     /// </summary>
     [System.Serializable]
+    [JsonConverter(typeof(Json.IVibeKeyObjectConverter))]
     public class VibeKeyObject : IVibeKey
     {
         public VibeKeyObject(string name)
@@ -37,7 +38,7 @@ namespace Vibes.Core
 
         public static implicit operator int(VibeKeyObject id) => id.Hash;
         public static implicit operator VibeKey(VibeKeyObject key) => new VibeKey(key);
-        public static implicit operator VibeKeyObject(VibeKey key) => new VibeKeyObject(key);
+        public static explicit operator VibeKeyObject(VibeKey key) => new VibeKeyObject(key);
 
         public bool Equals(IVibeKey other)
         {

@@ -1,8 +1,11 @@
+using Newtonsoft.Json;
+
 namespace Vibes
 {
     /// <summary>
     /// Immutable struct that holds the name and generated hash key of a vibe. Good for fast caching/referencing via code.
     /// </summary>
+    [JsonConverter(typeof(Json.IVibeKeyConverter))]
     public readonly struct VibeKey : IVibeKey
     {
         public VibeKey(string name)
