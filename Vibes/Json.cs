@@ -16,6 +16,10 @@ namespace Vibes
 
         public static string SerializeTable(IVibeTable table) => JsonConvert.SerializeObject(table);
         public static T DeserializeTable<T>(string json) where T : IVibeTable => JsonConvert.DeserializeObject<T>(json);
+
+        public static string SerializePool(IVibePool pool) => JsonConvert.SerializeObject(pool);
+        public static T DeserializePool<T>(string json) where T : IVibePool => JsonConvert.DeserializeObject<T>(json);
+
         #endregion
 
         #region Fields
@@ -23,9 +27,13 @@ namespace Vibes
         public const string JSON_TABLEDATA = "TableData";
         public const string JSON_TABLEDATA_KEY = "Key";
         public const string JSON_TABLEDATA_DATA = "Data";
+        public const string JSON_POOLDATA = "PoolData";
+        public const string JSON_POOLDATA_TABLE = "Table";
+        public const string JSON_POOLDATA_STACKS = "Stacks";
 
         private readonly static ConstructorCache key_constructors = new ConstructorCache(new[] { typeof(string) });
         private readonly static ConstructorCache table_constructors = new ConstructorCache(new[] { typeof(IEnumerable<KeyValuePair<IVibeKey, VibeTable.Data>>) });
+        private readonly static ConstructorCache pool_constructors = new ConstructorCache(new[] { typeof(IEnumerable<KeyValuePair<IVibeTable, float>>) });
         #endregion
 
         #region JsonConverters
@@ -50,14 +58,8 @@ namespace Vibes
             public override bool CanConvert(Type objectType) { return typeof(IVibeKey).IsAssignableFrom(objectType) && key_constructors.Retrieve(objectType) != null; }
         }
 
-        //TODO store and retreive table ID
         public class IVibeTableConverter : JsonConverter
         {
-            public override bool CanConvert(Type objectType)
-            {
-                return typeof(IVibeKey).IsAssignableFrom(objectType) && table_constructors.Retrieve(objectType) != null;
-            }
-
             public static IEnumerable<KeyValuePair<IVibeKey, VibeTable.Data>> ReadTableData(JsonReader reader)
             {
                 JObject obj = JObject.Load(reader);
@@ -90,12 +92,49 @@ namespace Vibes
                 obj.WriteTo(writer);
             }
 
-            public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+
+            public override bool CanConvert(Type objectType) { return typeof(IVibeTable).IsAssignableFrom(objectType) && table_constructors.Retrieve(objectType) != null; }
+            public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer) { return table_constructors.Invoke(objectType, ReadTableData(reader)); }
+            public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer) { WriteTable(writer, (IVibeTable)value); }
+        }
+
+        public class IVibePoolConverter : JsonConverter
+        {
+            public static IEnumerable<KeyValuePair<IVibeTable, float>> ReadPoolData(JsonReader reader)
             {
-                return table_constructors.Invoke(objectType, ReadTableData(reader));
+                JObject obj = JObject.Load(reader);
+                JArray array = (JArray)obj[JSON_POOLDATA];
+                var poolData = array.Select(item =>
+                        new KeyValuePair<IVibeTable, float>(
+                            item[JSON_POOLDATA_TABLE].ToObject<VibeTable>(), //TODO specific serialization to original table type
+                            item[JSON_POOLDATA_STACKS].ToObject<float>()
+                        )
+                    );
+
+                return poolData;
             }
 
-            public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer) { WriteTable(writer, (IVibeTable)value); }
+            public static void WritePool(JsonWriter writer, IVibePool value)
+            {
+                var data = value.GetData();
+                JArray array = new JArray();
+                foreach (var kvp in data)
+                {
+                    JObject kvpObj = new JObject
+                    {
+                        { JSON_POOLDATA_TABLE, JToken.FromObject(kvp.Key) },
+                        { JSON_POOLDATA_STACKS, JToken.FromObject(kvp.Value) }
+                    };
+                    array.Add(kvpObj);
+                }
+
+                JObject obj = new JObject() { { JSON_POOLDATA, array } };
+                obj.WriteTo(writer);
+            }
+
+            public override bool CanConvert(Type objectType) { return typeof(IVibePool).IsAssignableFrom(objectType) && pool_constructors.Retrieve(objectType) != null; }
+            public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer) { return pool_constructors.Invoke(objectType, ReadPoolData(reader)); }
+            public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer) { WritePool(writer, (IVibePool)value); }
         }
 
         #endregion

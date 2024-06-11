@@ -1,16 +1,20 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using Newtonsoft.Json;
 
 namespace Vibes.Core
 {
     [Serializable]
+    [JsonConverter(typeof(Json.IVibePoolConverter))]
     public class VibePool : IVibePool
     {
         protected readonly Dictionary<IVibeTable, float> tableData = new Dictionary<IVibeTable, float>();
         protected readonly List<IVibeTable> tableKeys = new List<IVibeTable>();
         public ReadOnlyCollection<IVibeTable> StoredKeys => tableKeys.AsReadOnly();
+        public IEnumerable<KeyValuePair<IVibeTable, float>> GetData() => tableData;
         public static bool StacksValid(float stacks) => stacks > 0;
+        public int Count => tableData.Count;
 
         public VibePool() { }
         public VibePool(params IVibeTable[] tables)

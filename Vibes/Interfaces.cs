@@ -48,6 +48,7 @@ namespace Vibes
 
     public interface IVibePool : IGetVibes, IStoreReadonlyKeys<IVibeTable>, IModifyStacks
     {
+        IEnumerable<KeyValuePair<IVibeTable, float>> GetData();
         int GetAllPoolData(ref List<KeyValuePair<IVibeKey, float>> dataOut);
         float GetStacks(IVibeTable tableKey);
     }

@@ -114,4 +114,82 @@ namespace Vibes.Core.Tests.Json
             //Assert.Equal(table, newTable); //TODO actual equality check between object instances
         }
     }
+
+    public class VibeTests_VibePoolJson
+    {
+        internal static VibePool GeneratePool(int numberOfTables, int tableSize, int stackSize)
+        {
+            KeyValuePair<IVibeTable, float>[] data = new KeyValuePair<IVibeTable, float>[numberOfTables];
+            for (int i = 0; i < numberOfTables; i++)
+            {
+                var tableData = VibeTests_VibeTableJson.GenerateTableData(tableSize);
+                data[i] = new(new VibeTable(tableData), stackSize);
+            }
+            return new VibePool(data);
+        }
+
+        [Theory]
+        [InlineData(0, 1, 1)]
+        [InlineData(1, 10, 2)]
+        [InlineData(1, 0, 1)]
+        [InlineData(10, 1, 1)]
+        [InlineData(10, 1, 0)]
+        public void Test_VibeTableSerialization(int numberOfTables, int tableSize, int stackSize)
+        {
+            VibePool pool = GeneratePool(numberOfTables, tableSize, stackSize);
+            var data = pool.GetData().ToArray();
+            int poolSize = pool.Count;
+
+            string json = Vibes.Json.SerializePool(pool);
+            JObject obj = JObject.Parse(json);
+            JArray array = (JArray)obj[Vibes.Json.JSON_POOLDATA];
+
+            //*Validate data
+            Assert.True(array.Count == poolSize, "Json Pool should be the same size as original. Expected: " + poolSize + ", Actual: " + array.Count);
+            for (int i = 0; i < poolSize; i++)
+            {
+                const string TABLE = Vibes.Json.JSON_POOLDATA_TABLE;
+                JArray tableArray = (JArray)array[i][TABLE][Vibes.Json.JSON_TABLEDATA];
+                VibeTests_VibeTableJson.ValidateTables(tableArray, data[i].Key.GetTableData().ToArray());
+
+                const string STACKS = Vibes.Json.JSON_POOLDATA_STACKS;
+                float stacks = array[i][STACKS].ToObject<float>();
+                Assert.Equal(data[i].Value, stacks);
+            }
+        }
+
+        [Theory]
+        [InlineData(0, 1, 1)]
+        [InlineData(1, 10, 2)]
+        [InlineData(1, 0, 1)]
+        [InlineData(10, 1, 1)]
+        [InlineData(10, 1, 0)]
+        public void Test_VibePoolDeserialization(int numberOfTables, int tableSize, int stackSize)
+        {
+            VibePool pool = GeneratePool(numberOfTables, tableSize, stackSize);
+            var firstPoolData = pool.GetData().ToArray();
+            int poolSize = pool.Count;
+            string json = Vibes.Json.SerializePool(pool);
+            var newPool = Vibes.Json.DeserializePool<VibePool>(json);
+            var newPoolData = newPool.GetData().ToArray();
+
+            Assert.True(newPool.Count == poolSize, "Json Pool should be the same size as original. Expected: " + poolSize + ", Actual: " + newPool.Count);
+            for (int i = 0; i < poolSize; i++)
+            {
+                //*Ensure stacks are the same
+                float expectedStacks = firstPoolData[i].Value;
+                float actualStacks = newPoolData[i].Value;
+                Assert.Equal(expectedStacks, actualStacks);
+
+                //*Ensure table data is the same
+                var expectedTableData = firstPoolData[i].Key.GetTableData();
+                var actualTable = (VibeTable)newPoolData[i].Key;
+                foreach (var expectedItem in expectedTableData)
+                {
+                    Assert.Equal(expectedItem.Value, actualTable.GetData(expectedItem.Key));
+                }
+            }
+            //Assert.Equal(pool, newPool); //TODO actual equality check between object instances
+        }
+    }
 }
