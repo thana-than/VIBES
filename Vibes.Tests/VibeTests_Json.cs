@@ -45,9 +45,9 @@ namespace Vibes.Core.Tests.Json
 
     public class VibeTests_VibeTableJson
     {
-        Random random = new Random();
-        Array operationValues = Enum.GetValues(typeof(VibeTable.ScalingAlgorithms.Operation));
-        KeyValuePair<IVibeKey, VibeTable.Data>[] GenerateTableData(int tableSize)
+        static readonly Random random = new Random();
+        static readonly Array operationValues = Enum.GetValues(typeof(VibeTable.ScalingAlgorithms.Operation));
+        public static KeyValuePair<IVibeKey, VibeTable.Data>[] GenerateTableData(int tableSize)
         {
             var tableData = new KeyValuePair<IVibeKey, VibeTable.Data>[tableSize];
             for (int i = 0; i < tableSize; i++)
@@ -74,18 +74,24 @@ namespace Vibes.Core.Tests.Json
             JArray array = (JArray)obj[Vibes.Json.JSON_TABLEDATA];
 
             //*Validate data
-            Assert.True(array.Count == tableSize, "Table should be the same size as given parameter " + tableSize);
-            for (int i = 0; i < tableSize; i++)
+            ValidateTables(array, tableData);
+        }
+
+        internal static void ValidateTables(JArray tableArray, KeyValuePair<IVibeKey, VibeTable.Data>[] tableData)
+        {
+            int size = tableData.Length;
+            Assert.True(tableArray.Count == size, "Table should be the same size as given parameter " + size);
+            for (int i = 0; i < size; i++)
             {
                 const string KEY = Vibes.Json.JSON_TABLEDATA_KEY;
-                Assert.Equal(array[i][KEY][Vibes.Json.JSON_NAME], tableData[i].Key.Name);
+                Assert.Equal(tableArray[i][KEY][Vibes.Json.JSON_NAME], tableData[i].Key.Name);
 
                 const string VALUE = Vibes.Json.JSON_TABLEDATA_DATA;
                 const int DATA_PARAMS = 3;
-                Assert.True(array[i][VALUE].Count() == DATA_PARAMS, "Data should only hold " + DATA_PARAMS + " parameters.");
-                Assert.Equal(array[i][VALUE][nameof(VibeTable.Data.value)], tableData[i].Value.value);
-                Assert.Equal(array[i][VALUE][nameof(VibeTable.Data.scale)], tableData[i].Value.scale);
-                Assert.Equal(array[i][VALUE][nameof(VibeTable.Data.operation)], (int)tableData[i].Value.operation);
+                Assert.True(tableArray[i][VALUE].Count() == DATA_PARAMS, "Data should only hold " + DATA_PARAMS + " parameters.");
+                Assert.Equal(tableArray[i][VALUE][nameof(VibeTable.Data.value)], tableData[i].Value.value);
+                Assert.Equal(tableArray[i][VALUE][nameof(VibeTable.Data.scale)], tableData[i].Value.scale);
+                Assert.Equal(tableArray[i][VALUE][nameof(VibeTable.Data.operation)], (int)tableData[i].Value.operation);
             }
         }
 

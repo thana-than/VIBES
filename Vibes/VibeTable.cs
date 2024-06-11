@@ -4,7 +4,6 @@ using Newtonsoft.Json;
 
 namespace Vibes.Core
 {
-    //TODO Table id for checking and serialization
     [Serializable]
     [JsonConverter(typeof(Json.IVibeTableConverter))]
     public class VibeTable : IVibeTable, IGetVibes, ISetVibes
@@ -14,27 +13,33 @@ namespace Vibes.Core
         public int Count => Storage.Count;
 
         public VibeTable() { }
-        public VibeTable(params KeyValuePair<IVibeKey, float>[] vibes)
+        public VibeTable(params KeyValuePair<IVibeKey, float>[] vibes) : this()
         {
             int len = vibes.Length;
             for (int i = 0; i < len; i++)
                 Add(vibes[i].Key, vibes[i].Value);
         }
 
-        public VibeTable(params KeyValuePair<string, float>[] vibes)
+        public VibeTable(params KeyValuePair<string, float>[] vibes) : this()
         {
             int len = vibes.Length;
             for (int i = 0; i < len; i++)
                 Add(vibes[i].Key, vibes[i].Value);
         }
 
-        public VibeTable(params KeyValuePair<IVibeKey, Data>[] vibes)
+        public VibeTable(params KeyValuePair<IVibeKey, Data>[] vibes) : this()
         {
             foreach (var v in vibes)
                 Set(v.Key, v.Value);
         }
 
-        public VibeTable(IEnumerable<KeyValuePair<IVibeKey, Data>> vibes)
+        public VibeTable(IEnumerable<KeyValuePair<IVibeKey, Data>> vibes) : this()
+        {
+            foreach (var v in vibes)
+                Set(v.Key, v.Value);
+        }
+
+        public VibeTable(IEnumerable<KeyValuePair<IVibeKey, Data>> vibes, Guid guid) : this()
         {
             foreach (var v in vibes)
                 Set(v.Key, v.Value);
