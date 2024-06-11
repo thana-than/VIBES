@@ -40,6 +40,21 @@ namespace Vibes.Core
             ValidateTables();
         }
 
+        public VibePool(IEnumerable<KeyValuePair<IVibeTable, float>> tableStacks)
+        {
+            //*Sum all the stacks provided, since duplicate tables may be provided
+            foreach (var item in tableStacks)
+            {
+                var table = item.Key;
+                float stack = item.Value;
+                if (!TryNew(table, stack))
+                    tableData[table] += stack;
+            }
+
+            //*Validate to ensure there are no invalid tables after the stacks have been summed
+            ValidateTables();
+        }
+
         void ValidateTables()
         {
             //*Ensure all our table stacks are a valid number (> 0), if they aren't remove!!!
